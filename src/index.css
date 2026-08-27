@@ -1,0 +1,9 @@
+@import "tailwindcss";
+:root{
+    --accent:#464083;
+    --main-bg: var(--color-white);
+    --accent-2: #F79F56;
+    --dull-accent1: #302b5f;
+    --dull-accent2: #333246;
+
+}
