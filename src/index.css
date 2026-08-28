@@ -1,9 +1,21 @@
 @import "tailwindcss";
 :root{
-    --accent:#464083;
+    --accent:#2D57E2;
     --main-bg: var(--color-white);
     --accent-2: #F79F56;
-    --dull-accent1: #302b5f;
-    --dull-accent2: #333246;
+    --dull-bg: #302b5f;
+    --dull-bg2: #d2d1d8b6;
 
+}
+input:not([type="radio"]):not([type="checkbox"]):not([type="button"]):not([type="submit"]){
+    color: var(--dull-bg);
+    font-size: 1.1rem;
+    padding: 1.1rem 1.8rem;
+    margin-bottom: 1rem;
+    
+    &:focus{
+        outline: none;
+        box-shadow: 0 0 2px 2px #302b5f59;
+        
+    }
 }
