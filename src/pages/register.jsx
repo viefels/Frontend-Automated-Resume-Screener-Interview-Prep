@@ -5,16 +5,29 @@ import { siteLogo as SiteLogo } from "../assets/Nav";
 import Navbar from "../components/navbar";
 
 export default function register(){
-    const [role, setRole] = useState("applicant");
-    const [email, setEmail] = useState("");
-    const [psw, setPsw] = useState("");
-    const [confirmPsw, setConfirmPsw] = useState("");
-    const [showPsw, setShowPsw] = useState(false);
+    const [isVisible, setIsVisible] = useState(false);
+    // const [isSamePsw, setIsSamePsw] = useState(false);
     const [agreeTerms, setAgreeTerms] = useState(false);
+    const [formData, setFormData] = useState({
+        role: "applicant",
+        email: "",
+        password: "",
+        confirmPsw: ""
+    });
 
-    const handleHidePsw = (e) =>{
-
+    const handleFormData = (e) => {
+        const { name, dataset } = e.currentTarget
+        const prop = name || dataset.name;
+        const value = e.target.value || dataset.value || ""
+        
+        // console.log(value)
+        setFormData( prev => ({
+            ...prev,
+            [prop]: value
+        }))
+        
     }
+    const isSamePsw = formData.password === formData.confirmPsw;
 
     return (
         <div className="flex justify-center align-center">
@@ -82,12 +95,14 @@ export default function register(){
                                     focus-visible:outline-none cursor-pointer" 
                                     key={r.type + "-role"} 
                                     tabIndex={0} 
-                                    onClick = {()=> setRole(r.type) }
+                                    data-name = "role"
+                                    data-value = {r.type}
+                                    onClick = { handleFormData }
                                     onKeyDown={(e) => {
 
                                         if (e.key === "Enter" || e.key === " ") {
                                             e.preventDefault();
-                                            setRole(r.type);
+                                            handleFormData(e);
                                         }
                                     }}
                                 >
@@ -98,8 +113,8 @@ export default function register(){
                                             type ="radio"
                                             value = {r.type}
                                             name = "role"
-                                            checked = { role === r.type }
-                                            onChange = {e => setRole(r.type) }
+                                            checked = { formData.role === r.type }
+                                            readOnly
                                             tabIndex={-1}
                                             className = "text-right pointer-events-none"
                                         />
@@ -122,18 +137,20 @@ export default function register(){
                                 id = "email"
                                 placeholder="Email"
                                 name="email"
-                                value = {email}
-                                onChange={(e) => setEmail(e.target.value)}
+                                value = {formData.email}
+                                onChange={ handleFormData }
+                                autoComplete="email"
                                 className="w-full bg-(--dull-bg2) rounded-lg placeholder:text-neutral-400"
                             />
 
                             <div className="relative">
                                 <input
-                                    type = {showPsw ? "text" : "password"}
+                                    type = {isVisible ? "text" : "password"}
                                     name="password"
                                     placeholder="Enter your password"
-                                    value = {psw}
-                                    onChange={(e) => setPsw(e.target.value)}
+                                    value = {formData.password}
+                                    onChange={handleFormData}
+                                    autoComplete="new-password"
                                     className="w-full bg-(--dull-bg2) rounded-lg placeholder:text-neutral-400"
                                 />
 
@@ -142,20 +159,23 @@ export default function register(){
                                     focus-visible:outline-none " 
                                     type="button" 
                                     tabIndex={0}
-                                    onClick={() => setShowPsw((prev)=> !prev)}
+                                    onClick={() => setIsVisible((prev)=> !prev)}
                                 >
-                                    {showPsw ? <EyeOffIcon/> : <EyeIcon/>}
+                                    {isVisible ? <EyeOffIcon/> : <EyeIcon/>}
                                 </button>
 
                                 <input
-                                    
-                                    type = {showPsw ? "text" : "password"}
-                                    id = "password-confirm"
+                                    type = {isVisible ? "text" : "password"}
                                     placeholder="Confirm your password"
-                                    value = {confirmPsw}
-                                    onChange={(e) => setConfirmPsw(e.target.value)}
-                                    className="w-full bg-(--dull-bg2) rounded-lg  placeholder:text-neutral-400"
+                                    name = "confirmPsw"
+                                    value = {formData.confirmPsw}
+                                    onChange={ (e) =>{
+                                        handleFormData(e);
+                                    }}
+                                    autoComplete="new-password"
+                                    className={`w-full bg-(--dull-bg2) rounded-lg  placeholder:text-neutral-400 ${ formData.confirmPsw && !isSamePsw ? "border-4 border-rose-500" : ""}`}
                                 />
+
                                 <label className="flex tracking-tight">
                                     <input
                                         
@@ -166,9 +186,12 @@ export default function register(){
                                         className="mr-4 accent-indigo-800 rounded-lg"
                                     />
                                     I agree to the<a href="#" className="ml-2 underline text-indigo-700"> Terms & Conditions</a>
+                                    
                                 </label>
-                                
-                                <button type="submit" className="w-full bg-(--accent) py-4 mt-8  text-neutral-100 rounded-lg">Create Account</button>
+                                {console.log(!formData.confirmPsw && isSamePsw)} 
+                                <button type="submit" disabled={!formData.confirmPsw || !isSamePsw} className="w-full bg-(--accent) py-4 mt-8  text-neutral-100 rounded-lg">
+                                    Create Account
+                                </button>
 
                             </div>
                         </div>
