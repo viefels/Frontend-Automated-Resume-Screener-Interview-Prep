@@ -7,7 +7,7 @@ function App() {
   const [count, setCount] = useState(0)
 
   return (
-    <main className="bg-(--main-bg) px-6 py-2 relative">
+    <main className="bg-(--main-bg) relative">
     
       <Register/>
     </main>

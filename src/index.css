@@ -1,18 +1,23 @@
 @import "tailwindcss";
 :root{
     --accent:#2D57E2;
+    --accent-disabled: #A4B5EC;
     --main-bg: var(--color-white);
     --accent-2: #F79F56;
     --dull-bg: #302b5f;
     --dull-bg2: #d2d1d8b6;
 
 }
-input:not([type="radio"]):not([type="checkbox"]):not([type="button"]):not([type="submit"]){
+input:not([type="radio"]):not([type="checkbox"]):not([type="button"]){
     color: var(--dull-bg);
     font-size: 1.1rem;
-    padding: 1.1rem 1.8rem;
-    margin-bottom: 1rem;
+    padding: 0.7rem 1.3rem;
+    margin-bottom: 0.8rem;
     
+    @media (min-width: 1024px) {
+        padding: 1.1rem 1.8rem;
+        margin-bottom: 1rem;
+    }
     &:focus{
         outline: none;
         box-shadow: 0 0 2px 2px #302b5f59;
