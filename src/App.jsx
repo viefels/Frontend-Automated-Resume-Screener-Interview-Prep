@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import Register from './pages/register';
 import Navbar from './components/navbar';
+import Login from './pages/login';
 import './App.css'
 
 function App() {
@@ -9,7 +10,7 @@ function App() {
   return (
     <main className="bg-(--main-bg) relative">
     
-      <Register/>
+      <Login/>
     </main>
   )
 }

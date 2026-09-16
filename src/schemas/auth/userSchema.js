@@ -1,8 +1,8 @@
 import { object, string, pipe, minLength, email, literal, forward, partialCheck, picklist } from "valibot";
 
-const userSchema = pipe(
+export const register = pipe(
     object({
-        role: picklist(["applicant", "recruiter"], "Please select a valid role"),
+        role: picklist(["candidate", "recruiter"], "Please select a valid role"),
         email: pipe(
             string(),
             minLength(4, "Email is required"), 
@@ -24,4 +24,17 @@ const userSchema = pipe(
         ), ["confirmPsw"]
     )
 )
-export default userSchema;
+
+export const login = pipe(
+    object({
+        email: pipe(
+            string(),
+            minLength(4, "Email is required"), 
+            email("Please enter a valid email address")
+        ),
+        password: pipe(
+            string(),
+            minLength(6, "Password must be at least 6 characters")
+        )
+    })
+)
