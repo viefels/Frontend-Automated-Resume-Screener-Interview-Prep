@@ -3,6 +3,10 @@ import { object, string, pipe, minLength, email, literal, forward, partialCheck,
 export const register = pipe(
     object({
         role: picklist(["candidate", "recruiter"], "Please select a valid role"),
+        fullname: pipe(
+            string(),
+            minLength(4, "Please provide fullname with at least 4 characters")
+        ),
         email: pipe(
             string(),
             minLength(4, "Email is required"), 
@@ -10,11 +14,11 @@ export const register = pipe(
         ),
         password: pipe(
             string(),
-            minLength(6, "Password must be at least 6 characters")
+            minLength(8, "Password must be at least 8 characters")
         ),
         confirmPsw: pipe(
             string(),
-            minLength(6, "Please confirm your password")
+            minLength(8, "Please confirm your password")
         ),
         agreeTerms: literal(true, "You must agree to the terms")
     }),
@@ -34,7 +38,7 @@ export const login = pipe(
         ),
         password: pipe(
             string(),
-            minLength(6, "Password must be at least 6 characters")
+            minLength(8, "Password must be at least 8 characters")
         )
     })
 )

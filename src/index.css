@@ -1,6 +1,7 @@
 @import "tailwindcss";
 :root{
-    --accent:#2D57E2;
+    --accent:#183596;
+    --accent-light:#344375;
     --accent-disabled: #A4B5EC;
     --main-bg: var(--color-white);
     --accent-2: #F79F56;
@@ -8,7 +9,18 @@
     --dull-bg2: #d2d1d8b6;
 
 }
-input:not([type="radio"]):not([type="checkbox"]):not([type="button"]){
+a{
+    cursor: pointer;
+}
+button:not(.except){
+    cursor: pointer;
+    background-color: var(--accent);
+    
+    &:hover{
+        background-color: var(--accent-light);
+    }
+}
+input:not([type="radio"]):not([type="checkbox"]):not([type="button"]):not(.except){
     color: var(--dull-bg);
     font-size: 1.1rem;
     padding: 0.7rem 1.3rem;

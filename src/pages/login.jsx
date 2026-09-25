@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { safeParse, flatten } from "valibot";
+import { safeParse, flatten, set } from "valibot";
 
 import { businessAvatar, signUpLarge, resumeIcon, EyeIcon, EyeOffIcon } from "../assets/signupPage.assets";
 import SmoothImage from "../components/ui/SmoothImage";
@@ -8,38 +8,41 @@ import Navbar from "../components/navbar";
 import * as userSchema from "../schemas/auth/userSchema";
 
 export default function Login(){
-  const [isVisible, setIsVisible] = useState(false);
-  const [serverError, setServerError] = useState(null);
+  const [pswIsVisible, setPswIsVisible] = useState(false);
+  const [success, setSuccess] = useState(false);
+  const [serverRes, setServerRes] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formErrors, setFormErrors] = useState({})
   
   const [formData, setFormData] = useState({
     email: "",
-    password: ""
+    password: "",
+    stayLoggedIn: false
   });
   
   const isSamePsw = formData.password === formData.confirmPsw;
 
   const handleFormData = (e) => {
-    const { name, dataset } = e.currentTarget
+    const { name, dataset, type, checked} = e.currentTarget
     const prop = name || dataset.name;
     const value = e.target.value || dataset.value || ""
 
     setFormErrors({});
-    setServerError(null)
+    setServerRes(null);
+    setSuccess(false);
     
     setFormData( prev => ({
         ...prev,
-        [prop]: value
+        [prop]: type === "checkbox" ? checked : value
     }))
       
   }
 
   const handleSubmit = async (e) =>{
     e.preventDefault();
-    setServerError(null);
-    setSuccess(false);
+    setServerRes(null);
     setIsSubmitting(false);
+    setSuccess(false);
 
     const result = safeParse(userSchema.login, formData);
     if(!result.success){
@@ -56,7 +59,7 @@ export default function Login(){
     try{
       
 
-      const res = await fetch("https://automated-resume-screener-interview.onrender.com/api/register", {
+      const res = await fetch("https://automated-resume-screener-interview.onrender.com/api/login", {
         method: "POST",
         headers: { "Content-Type": "application/json"},
         body: JSON.stringify(formData)
@@ -68,7 +71,8 @@ export default function Login(){
         throw new Error (data.message || "Failed to create account. Please try again.")
       }
 
-      setSuccess(data.success);
+      setSuccess(true);
+      localStorage.setItem("AuthToken", data.token);
       setFormData({
         email: "",
         password: ""
@@ -76,7 +80,7 @@ export default function Login(){
 
     }
     catch(err){
-      setServerError(err.message)
+      setServerRes(err.message)
     }
     finally{
       setIsSubmitting(false);
@@ -151,11 +155,11 @@ export default function Login(){
 
               <div className="relative">
                 <input
-                    type = {isVisible ? "text" : "password"}
+                    type = {pswIsVisible ? "text" : "password"}
                     name="password"
                     placeholder="Enter your password"
                     value = {formData.password}
-                    onChange={handleFormData}
+                    onChange={ handleFormData }
                     minLength={6}
                     autoComplete="new-password"
                     className="w-full bg-(--dull-bg2) rounded-lg placeholder:text-neutral-400"
@@ -166,19 +170,29 @@ export default function Login(){
                     className="absolute top-1/2 right-6 -translate-y-[80%] text-neutral-600 focus-visible:ring-2 focus-visible:ring-[#302b5f59] focus-visible:outline-none" 
                     type="button" 
                     tabIndex={0}
-                    onClick={() => setIsVisible((prev)=> !prev)}
+                    onClick={() => setPswIsVisible((prev)=> !prev)}
                 >
-                    {isVisible ? <EyeOffIcon/> : <EyeIcon/>}
+                    {pswIsVisible ? <EyeOffIcon/> : <EyeIcon/>}
                 </button>
               </div>
               
-              { serverError && (
-                <div className="rounded-lg border border-red-500 bg-red-100 p-3 mt-2 -mb-1 lg:-mb-5 text-sm text-red-400">
-                  {serverError} 
+              { serverRes && (
+                <div className="rounded-lg border border-red-500 bg-red-100 p-3 mt-1 mb-1 text-sm text-red-400">
+                  {serverRes} 
                 </div>
               )}
+
+              { success && (
+                <p className="rounded-lg border border-green-500 bg-green-100 p-3 mt-1 mb-1 text-sm text-green-600">
+                  Logged In successfully
+                </p>
+              )}
+
+              <div className="flex justify-end">
+                <a className="border-b-1 text-indigo-600 focus-visible:ring-2 focus-visible:ring-[#302b5f59] focus-visible:outline-none ">Forgot password?</a>
+              </div>
                   
-              <button type="submit" disabled={isSubmitting} className={`w-full bg-(--accent) py-3 lg:py-4 mt-4 lg:mt-8  text-neutral-100 rounded-lg hover:bg-(--dull-bg) hover:cursor-pointer ${isSubmitting ? "bg-(--accent-disabled)":""}`}>
+              <button type="submit" disabled={isSubmitting} className={`w-full bg-(--accent) py-3 lg:py-4 mt-4 lg:mt-6  text-neutral-100 rounded-lg  ${isSubmitting ? "bg-(--accent-disabled) hover:bg-(--accent-disabled) hover:cursor-default":"hover:bg-(--dull-bg) hover:cursor-pointer"}`}>
                 {isSubmitting ? "Logging In..." : "Login"}
               </button>
             </div>
