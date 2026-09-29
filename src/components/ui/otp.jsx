@@ -1,7 +1,6 @@
 import { useState } from 'react';
 
-export default function Otp({ length = 6, className = '' }) {
-  const [otp, setOtp] = useState('');
+export default function Otp({ length = 6, className = '', otp, setOtp}) {
 
   const forceCursorToEnd = (e) => {
     const valLength = e.target.value.length;

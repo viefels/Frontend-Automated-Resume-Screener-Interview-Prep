@@ -9,16 +9,20 @@
     --dull-bg2: #d2d1d8b6;
 
 }
+@layer components {
+  .btn-primary {
+    @apply bg-[#183596] hover:bg-[#122873] active:bg-[#0d1d54] text-white cursor-pointer transition-colors
+            disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-[#183596] disabled:active:bg-[#183596];
+  }
+}
+
 a{
     cursor: pointer;
 }
 button:not(.except){
     cursor: pointer;
-    background-color: var(--accent);
-    
-    &:hover{
-        background-color: var(--accent-light);
-    }
+    /* background-color: var(--accent); */
+
 }
 input:not([type="radio"]):not([type="checkbox"]):not([type="button"]):not(.except){
     color: var(--dull-bg);
