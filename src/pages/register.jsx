@@ -2,24 +2,22 @@ import { useState } from "react";
 import { safeParse, flatten } from "valibot";
 import { Eye as EyeIcon, EyeOff as EyeOffIcon } from "lucide-react";
 
+
 import { businessAvatar, signUpLarge, resumeIcon} from "../assets/signupPage.assets";
 import SmoothImage from "../components/ui/SmoothImage";
 import { siteLogo as SiteLogo } from "../assets/Nav";
 import Navbar from "../components/navbar";
 import * as userSchema from "../schemas/auth/userSchema.js";
-
 import VerifyEmail from "../components/verify-email.jsx";
+import useApi from "../hooks/useApi.js";
+
 
 export default function register(){
   const [step, setStep] = useState(1);
   const [isVisible, setIsVisible] = useState(false);
-  const [success, setSuccess] = useState(false);
-  const [serverError, setServerError] = useState(null);
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const [formErrors, setFormErrors] = useState({})
-  
+
   const [agreeTerms, setAgreeTerms] = useState(false);
-  
   const [formData, setFormData] = useState({
     role: "candidate",
     fullname: "",
@@ -30,13 +28,14 @@ export default function register(){
   
   const isSamePsw = formData.password === formData.confirmPsw;
 
+  const { request, loading, error, data, status } = useApi()
+
   const handleFormData = (e) => {
     const { name, dataset } = e.currentTarget
     const prop = name || dataset.name;
     const value = e.target.value || dataset.value || ""
 
     setFormErrors({});
-    setServerError(null)
     
     setFormData( prev => ({
         ...prev,
@@ -47,9 +46,6 @@ export default function register(){
 
   const handleSubmit = async (e) =>{
     e.preventDefault();
-    setServerError(null);
-    setSuccess(false);
-    setIsSubmitting(false);
 
     const result = safeParse(userSchema.register, { agreeTerms,...formData });
     if(!result.success){
@@ -61,40 +57,18 @@ export default function register(){
       return;
     }
 
-    setIsSubmitting(true);
+    const {confirmPsw, ...userData} = formData;
 
-    try{
-      const {confirmPsw, ...userData} = formData;
-      const backendUrl = `http://${window.location.hostname}:3000`;
-
-      const res = await fetch(`${backendUrl}/api/register`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json"},
-        body: JSON.stringify(userData)
-      });
-      
-      const data = await res.json().catch(()=>({}));
-
-      if( !res.ok || !data.success ){
-        const error = new Error(data.message || "Failed to create account. Please try again.");
-        error.success = data.success; 
-        throw error;
-      }
-
-      setSuccess(data.success);
+    const res = await request("/api/register", {
+      method: "POST",
+      body: JSON.stringify(userData) 
+    });
+    
+    if(res.data.success){
       setStep(2)
-
     }
-    catch(err){
-      setServerError(err)
-    }
-    finally{
-      setIsSubmitting(false);
-    }
-
-
+    
   }
-
 
   return (
     <div className="flex justify-center align-center">
@@ -277,14 +251,23 @@ export default function register(){
                   {formErrors.agreeTerms && <span className="text-red-600 text-sm ml-4">({formErrors.agreeTerms})</span>}
                 </label>
                 
-                { serverError?.success && (
+                { error && (
                   <div className="rounded-lg border border-red-500 bg-red-100 p-3 mt-2 -mb-1 lg:-mb-5 text-sm text-red-400">
-                    {serverError.message} 
+                    {error} 
                   </div>
                 )}
+
+                {loading ? 
+                  <button type="submit" disabled className={`w-full btn-primary py-3 lg:py-4 mt-4 lg:mt-8 text-neutral-100 rounded-lg`}>
+                    Sign Up
+                  </button> :
+                  <button type="submit" className={`w-full btn-primary py-3 lg:py-4 mt-4 lg:mt-8 text-neutral-100 rounded-lg`}>
+                    Sign Up
+                  </button>
+                }
                     
-                <button type="submit" disabled={isSubmitting} className={`w-full bg-(--accent) py-3 lg:py-4 mt-4 lg:mt-8  text-neutral-100 rounded-lg  ${isSubmitting ? "bg-(--accent-disabled)":"hover:bg-(--dull-bg) hover:cursor-pointer"}`}>
-                  {isSubmitting ? "Creating Account..." : "Sign Up"}
+                <button type="submit" disabled={loading} className={`w-full btn-primary py-3 lg:py-4 mt-4 lg:mt-8 text-neutral-100 rounded-lg  ${loading ? "bg-(--accent-disabled)":""}`}>
+                  {loading ? "Creating Account..." : "Sign Up"}
                 </button>
               </div>
             </div>
@@ -293,11 +276,11 @@ export default function register(){
           
         {step === 2 && (
           <VerifyEmail 
-            email = {success ? formData.email : ""} 
+            email = {data.success ? formData.email : ""} 
             className="flex-1 w-full h-full px-2 lg:px-20 py-8 relative " 
             onBack={()=> setStep(1)}
-            onSubmit={handleSubmit}
-            serverError={serverError}
+            onResend={handleSubmit}
+            serverError={error}
           />
         )}
       </main>
